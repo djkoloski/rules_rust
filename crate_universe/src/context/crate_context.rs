@@ -247,7 +247,7 @@ impl CrateContext {
     pub fn new(
         annotation: &CrateAnnotation,
         packages: &BTreeMap<PackageId, Package>,
-        source_annotations: &BTreeMap<PackageId, SourceAnnotation>,
+        source_annotations: &BTreeMap<PackageId, Option<SourceAnnotation>>,
         extras: &BTreeMap<CrateId, PairredExtras>,
         include_build_scripts: bool,
     ) -> Self {
@@ -352,7 +352,7 @@ impl CrateContext {
         };
 
         // Save the repository information for the current crate
-        let repository = source_annotations.get(&package.id).cloned();
+        let repository = source_annotations.get(&package.id).cloned().flatten();
 
         // Identify the license type
         let license = package.license.clone();
