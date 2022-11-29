@@ -226,7 +226,12 @@ def _crates_vendor_impl(ctx):
         args.extend(["--buildifier", _runfiles_path(ctx.executable.buildifier.short_path, is_windows)])
         cargo_bazel_runfiles.append(ctx.executable.buildifier)
 
-    # Dtermine platform specific settings
+    # Optionally include an explicit `bazel` path
+    if ctx.attr.bazel:
+        args.extend(["--bazel", _runfiles_path(ctx.executable.bazel.short_path, is_windows)])
+        cargo_bazel_runfiles.append(ctx.executable.bazel)
+
+    # Determine platform specific settings
     if is_windows:
         extension = ".bat"
         template = _WINDOWS_WRAPPER
@@ -334,6 +339,12 @@ call against the generated workspace. The following table describes how to contr
     attrs = {
         "annotations": attr.string_list_dict(
             doc = "Extra settings to apply to crates. See [crate.annotation](#crateannotation).",
+        ),
+        "bazel": attr.label(
+            doc = "The path to a bazel binary used to locate the output_base for the current workspace.",
+            cfg = "exec",
+            executable = True,
+            allow_files = True,
         ),
         "buildifier": attr.label(
             doc = "The path to a [buildifier](https://github.com/bazelbuild/buildtools/blob/5.0.1/buildifier/README.md) binary used to format generated BUILD files.",
