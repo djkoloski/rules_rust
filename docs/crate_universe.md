@@ -48,6 +48,7 @@ load("@rules_rust//crate_universe:defs.bzl", "crates_repository")
 
 crates_repository(
     name = "crate_index",
+    cargo_lockfile = "//:Cargo.lock",
     lockfile = "//:Cargo.Bazel.lock",
     manifests = ["//:Cargo.toml"],
 )
@@ -101,10 +102,11 @@ about missing targets or environment variables defined only in Bazel. In workspa
 to have a "Cargo free" setup. `crates_repository` supports this through the `packages` attribute.
 
 ```python
-load("@cargo_bazel//:defs.bzl", "crate", "crates_repository", "render_config")
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_repository", "render_config")
 
 crates_repository(
     name = "crate_index",
+    cargo_lockfile = "//:Cargo.lock",
     lockfile = "//:Cargo.Bazel.lock",
     packages = {
         "async-trait": crate.spec(
@@ -236,7 +238,7 @@ crates_repository(
 The above will create an external repository which contains aliases and macros for accessing
 Rust targets found in the dependency graph defined by the given manifests.
 
-**NOTE**: The `lockfile` must be manually created. The rule unfortunately does not yet create
+**NOTE**: The `cargo_lockfile` and `lockfile` must be manually created. The rule unfortunately does not yet create
 it on its own. When initially setting up this rule, an empty file should be created and then
 populated by repinning dependencies.
 
@@ -292,7 +294,7 @@ that is called behind the scenes to update dependencies.
 | <a id="crates_repository-rust_toolchain_rustc_template"></a>rust_toolchain_rustc_template |  The template to use for finding the host <code>rustc</code> binary. <code>{version}</code> (eg. '1.53.0'), <code>{triple}</code> (eg. 'x86_64-unknown-linux-gnu'), <code>{arch}</code> (eg. 'aarch64'), <code>{vendor}</code> (eg. 'unknown'), <code>{system}</code> (eg. 'darwin'), <code>{cfg}</code> (eg. 'exec'), and <code>{tool}</code> (eg. 'cargo.exe') will be replaced in the string if present.   | String | optional | "@rust_{system}_{arch}__{triple}_tools//:bin/{tool}" |
 | <a id="crates_repository-rust_version"></a>rust_version |  The version of Rust the currently registered toolchain is using. Eg. <code>1.56.0</code>, or <code>nightly-2021-09-08</code>   | String | optional | "1.65.0" |
 | <a id="crates_repository-splicing_config"></a>splicing_config |  The configuration flags to use for splicing Cargo maniests. Use <code>//crate_universe:defs.bzl\%rsplicing_config</code> to generate the value for this field. If unset, the defaults defined there will be used.   | String | optional | "" |
-| <a id="crates_repository-supported_platform_triples"></a>supported_platform_triples |  A set of all platform triples to consider when generating dependencies.   | List of strings | optional | ["i686-apple-darwin", "i686-pc-windows-msvc", "i686-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "aarch64-apple-ios", "aarch64-apple-ios-sim", "aarch64-linux-android", "aarch64-unknown-linux-gnu", "arm-unknown-linux-gnueabi", "armv7-unknown-linux-gnueabi", "armv7-linux-androideabi", "i686-linux-android", "i686-unknown-freebsd", "powerpc-unknown-linux-gnu", "s390x-unknown-linux-gnu", "wasm32-unknown-unknown", "wasm32-wasi", "x86_64-apple-ios", "x86_64-linux-android", "x86_64-unknown-freebsd", "riscv32imc-unknown-none-elf"] |
+| <a id="crates_repository-supported_platform_triples"></a>supported_platform_triples |  A set of all platform triples to consider when generating dependencies.   | List of strings | optional | ["i686-apple-darwin", "i686-pc-windows-msvc", "i686-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "aarch64-apple-ios", "aarch64-apple-ios-sim", "aarch64-pc-windows-msvc", "aarch64-linux-android", "aarch64-unknown-linux-gnu", "arm-unknown-linux-gnueabi", "armv7-unknown-linux-gnueabi", "armv7-linux-androideabi", "i686-linux-android", "i686-unknown-freebsd", "powerpc-unknown-linux-gnu", "s390x-unknown-linux-gnu", "wasm32-unknown-unknown", "wasm32-wasi", "x86_64-apple-ios", "x86_64-linux-android", "x86_64-unknown-freebsd", "riscv32imc-unknown-none-elf"] |
 
 
 <a id="crates_vendor"></a>
@@ -395,7 +397,7 @@ call against the generated workspace. The following table describes how to contr
 | <a id="crates_vendor-packages"></a>packages |  A set of crates (packages) specifications to depend on. See [crate.spec](#crate.spec).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | <a id="crates_vendor-repository_name"></a>repository_name |  The name of the repository to generate for <code>remote</code> vendor modes. If unset, the label name will be used   | String | optional | "" |
 | <a id="crates_vendor-splicing_config"></a>splicing_config |  The configuration flags to use for splicing Cargo maniests. Use <code>//crate_universe:defs.bzl\%rsplicing_config</code> to generate the value for this field. If unset, the defaults defined there will be used.   | String | optional | "" |
-| <a id="crates_vendor-supported_platform_triples"></a>supported_platform_triples |  A set of all platform triples to consider when generating dependencies.   | List of strings | optional | ["i686-apple-darwin", "i686-pc-windows-msvc", "i686-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "aarch64-apple-ios", "aarch64-apple-ios-sim", "aarch64-linux-android", "aarch64-unknown-linux-gnu", "arm-unknown-linux-gnueabi", "armv7-unknown-linux-gnueabi", "armv7-linux-androideabi", "i686-linux-android", "i686-unknown-freebsd", "powerpc-unknown-linux-gnu", "s390x-unknown-linux-gnu", "wasm32-unknown-unknown", "wasm32-wasi", "x86_64-apple-ios", "x86_64-linux-android", "x86_64-unknown-freebsd", "riscv32imc-unknown-none-elf"] |
+| <a id="crates_vendor-supported_platform_triples"></a>supported_platform_triples |  A set of all platform triples to consider when generating dependencies.   | List of strings | optional | ["i686-apple-darwin", "i686-pc-windows-msvc", "i686-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "aarch64-apple-ios", "aarch64-apple-ios-sim", "aarch64-pc-windows-msvc", "aarch64-linux-android", "aarch64-unknown-linux-gnu", "arm-unknown-linux-gnueabi", "armv7-unknown-linux-gnueabi", "armv7-linux-androideabi", "i686-linux-android", "i686-unknown-freebsd", "powerpc-unknown-linux-gnu", "s390x-unknown-linux-gnu", "wasm32-unknown-unknown", "wasm32-wasi", "x86_64-apple-ios", "x86_64-linux-android", "x86_64-unknown-freebsd", "riscv32imc-unknown-none-elf"] |
 | <a id="crates_vendor-vendor_path"></a>vendor_path |  The path to a directory to write files into. Absolute paths will be treated as relative to the workspace root   | String | optional | "crates" |
 
 
