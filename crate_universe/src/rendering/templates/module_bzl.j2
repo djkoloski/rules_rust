@@ -317,7 +317,8 @@ _CONDITIONS = {
     "{{ condition | addslashes }}": {{ triples | sort | json_encode | safe }},
 {%- endfor %}
 }
-{% set current_vendor_mode = vendor_mode | default(value="remote") %}{% if current_vendor_mode == "remote" %}
+{% set current_vendor_mode = vendor_mode | default(value="remote") -%}
+{% if current_vendor_mode == "remote" or current_vendor_mode == "local_repository" %}
 ###############################################################################
 
 def crate_repositories():
@@ -326,7 +327,9 @@ def crate_repositories():
 {%- for id, crate in context.crates %}
 {%- if not crate.repository %}{% continue %}{% endif %}
 {%- for repository_type, attrs in crate.repository %}
-{%- if repository_type in ["Http"] %}
+{%- if current_vendor_mode == "local_repository" %}
+{% include "partials/module/repo_local.j2" %}
+{%- elif repository_type in ["Http"] %}
 {% include "partials/module/repo_http.j2" %}
 {%- elif repository_type in ["Git"] %}
 {% include "partials/module/repo_git.j2" %}

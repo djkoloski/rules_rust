@@ -113,6 +113,13 @@ impl TemplateEngine {
                 )),
             ),
             (
+                "partials/module/repo_local.j2",
+                include_str!(concat!(
+                    env!("CARGO_MANIFEST_DIR"),
+                    "/src/rendering/templates/partials/module/repo_local.j2"
+                )),
+            ),
+            (
                 "partials/starlark/glob.j2",
                 include_str!(concat!(
                     env!("CARGO_MANIFEST_DIR"),
@@ -197,6 +204,10 @@ impl TemplateEngine {
         tera.register_function(
             "crates_module_label",
             module_label_fn_generator(render_config.crates_module_template.clone()),
+        );
+        tera.register_function(
+            "vendor_path",
+            vendor_path_fn_generator(render_config.vendor_path_template.clone())
         );
         tera.register_filter(
             "remap_deps_configurations",
@@ -409,6 +420,21 @@ fn crate_repository_fn_generator(template: String, repository_name: String) -> i
             ))) {
                 Ok(v) => Ok(v),
                 Err(_) => Err(tera::Error::msg("Failed to generate crate repository name")),
+            }
+        },
+    )
+}
+
+/// Convert a crate name into a vendored module name by applying transforms to invalid characters.
+fn vendor_path_fn_generator(template: String) -> impl tera::Function {
+    Box::new(
+        move |args: &HashMap<String, Value>| -> tera::Result<Value> {
+            let name = parse_tera_param!("name", String, args);
+            let version = parse_tera_param!("version", String, args);
+
+            match to_value(render_crate_build_file(&template, &name, &version)) {
+                Ok(v) => Ok(v),
+                Err(_) => Err(tera::Error::msg("Failed to generate vendor path")),
             }
         },
     )

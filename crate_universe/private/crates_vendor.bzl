@@ -152,6 +152,10 @@ def _write_config_file(ctx):
             output_pkg,
         ),
         "vendor_mode": ctx.attr.mode,
+        "vendor_path_template": "@{}//{}/{{name}}-{{version}}".format(
+            workspace_name,
+            output_pkg,
+        ),
     })
 
     config_data = compile_config(
@@ -383,13 +387,15 @@ call against the generated workspace. The following table describes how to contr
         ),
         "mode": attr.string(
             doc = (
-                "Flags determining how crates should be vendored. `local` is where crate source and BUILD files are " +
-                "written to the repository. `remote` is where only BUILD files are written and repository rules " +
-                "used to fetch source code."
+                "Flags determining how crates should be vendored. `local` and `local_repository` have crate source " +
+                "and BUILD files written to the repository. `local` stores BUILD files directly in its respective crate source " +
+                "directories, while `local_repository` stores BUILD files in the vendored directory directly above the crate " +
+                "source directories. `remote` writes only BUILD files, and repository rules are used to fetch crate source."
             ),
             values = [
                 "local",
                 "remote",
+                "local_repository",
             ],
             default = "remote",
         ),

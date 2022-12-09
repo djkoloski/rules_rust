@@ -16,13 +16,16 @@ use serde::{Deserialize, Serialize, Serializer};
 
 /// Representations of different kinds of crate vendoring into workspaces.
 #[derive(Debug, Serialize, Deserialize, Hash, Clone)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum VendorMode {
     /// Crates having full source being vendored into a workspace
     Local,
 
     /// Crates having only BUILD files with repository rules vendored into a workspace
     Remote,
+
+    /// Crates have full source vendored into a workspace, with each crate in a separate repository
+    LocalRepository,
 }
 
 impl std::fmt::Display for VendorMode {
@@ -31,6 +34,7 @@ impl std::fmt::Display for VendorMode {
             match self {
                 VendorMode::Local => "local",
                 VendorMode::Remote => "remote",
+                VendorMode::LocalRepository => "local_repository",
             },
             f,
         )
@@ -78,6 +82,11 @@ pub struct RenderConfig {
 
     /// An optional configuration for rendirng content to be rendered into repositories.
     pub vendor_mode: Option<VendorMode>,
+
+    /// The pattern to use for vendor directory path.
+    /// Eg. `//vendor/{name}-{version}`
+    #[serde(default = "default_vendor_path_template")]
+    pub vendor_path_template: String
 }
 
 fn default_build_file_template() -> String {
@@ -98,6 +107,10 @@ fn default_crate_repository_template() -> String {
 
 fn default_platforms_template() -> String {
     "@rules_rust//rust/platform:{triple}".to_owned()
+}
+
+fn default_vendor_path_template() -> String {
+    "//vendor/{name}-{version}".to_owned()
 }
 
 /// A representation of some Git identifier used to represent the "revision" or "pin" of a checkout.

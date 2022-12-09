@@ -6,7 +6,8 @@ exports_files(
     [
         "cargo-bazel.json",
         "defs.bzl",
-        {%- set current_vendor_mode = vendor_mode | default(value="") %}{%- if current_vendor_mode == "remote" %}"crates.bzl",{%- endif %}
+        {%- set current_vendor_mode = vendor_mode | default(value="") -%}
+        {%- if current_vendor_mode == "remote" or current_vendor_mode == "local_repository" %}"crates.bzl",{%- endif %}
     ] + glob([
         "*.bazel",
     ]),

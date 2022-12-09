@@ -35,6 +35,7 @@ CARGO_BAZEL_SRCS = [
     Label("//crate_universe:src/rendering/templates/partials/module/deps_map.j2"),
     Label("//crate_universe:src/rendering/templates/partials/module/repo_git.j2"),
     Label("//crate_universe:src/rendering/templates/partials/module/repo_http.j2"),
+    Label("//crate_universe:src/rendering/templates/partials/module/repo_local.j2"),
     Label("//crate_universe:src/rendering/templates/partials/starlark/glob.j2"),
     Label("//crate_universe:src/rendering/templates/partials/starlark/selectable_dict.j2"),
     Label("//crate_universe:src/rendering/templates/partials/starlark/selectable_list.j2"),

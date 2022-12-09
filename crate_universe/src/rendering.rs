@@ -37,7 +37,7 @@ impl Renderer {
                 crate::config::VendorMode::Local => {
                     // Nothing to do for local vendor crate
                 }
-                crate::config::VendorMode::Remote => {
+                crate::config::VendorMode::Remote | crate::config::VendorMode::LocalRepository => {
                     output.extend(self.render_vendor_support_files(context)?);
                 }
             }

@@ -180,7 +180,7 @@ pub fn vendor(opt: VendorOptions) -> Result<()> {
     }
 
     // Vendor the crates from the spliced workspace
-    if matches!(config.rendering.vendor_mode, Some(VendorMode::Local)) {
+    if matches!(config.rendering.vendor_mode, Some(VendorMode::Local) | Some(VendorMode::LocalRepository)) {
         VendorGenerator::new(opt.cargo.clone(), opt.rustc.clone())
             .generate(manifest_path.as_path_buf(), &vendor_dir)
             .context("Failed to vendor dependencies")?;
